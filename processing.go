@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 )
@@ -39,17 +41,17 @@ func MakeUrl(config Config, qp QueryParams) (*url.URL, error) {
 }
 
 func Send(url url.URL) error {
-	log.Println(url.String())
-	//resp, err := http.Get(url.String())
-	//if err != nil {
-	//	return fmt.Errorf("http get error: %w", err)
-	//}
-	//defer resp.Body.Close()
-	//
-	//if resp.StatusCode != http.StatusOK {
-	//	body, _ := io.ReadAll(resp.Body)
-	//	return fmt.Errorf("http status: %s body: %s", resp.Status, body)
-	//}
+	resp, err := http.Get(url.String())
+	if err != nil {
+		return fmt.Errorf("http get error: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("url: %s\nstatus: %s\nbody: %s\n", url.String(), resp.Status, body)
+	}
+	log.Printf("url: %s\nstatus: %s\nbody: %s\n", url.String(), resp.Status, body)
 
 	return nil
 }

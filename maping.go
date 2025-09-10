@@ -11,7 +11,7 @@ const (
 )
 
 type Mapping struct {
-	raw     string
+	colMap  string
 	storage map[string]string
 }
 
@@ -24,14 +24,14 @@ func (m *Mapping) queryParam(name string) (string, error) {
 }
 
 func (m *Mapping) validate() bool {
-	return m.raw != "" && strings.Contains(m.raw, mapKeyValueSeparator)
+	return m.colMap != "" && strings.Contains(m.colMap, mapKeyValueSeparator)
 }
 
 func (m *Mapping) parse() error {
-	elemsArr := strings.Split(m.raw, mapElemSeparator)
+	elemsArr := strings.Split(m.colMap, mapElemSeparator)
 	m.storage = make(map[string]string, len(elemsArr))
 	if len(elemsArr) == 0 {
-		return fmt.Errorf("storage source shoul be grater than 0: %s", m.raw)
+		return fmt.Errorf("storage source shoul be grater than 0: %s", m.colMap)
 	}
 
 	for _, keyValueString := range elemsArr {

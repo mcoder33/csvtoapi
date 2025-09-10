@@ -13,7 +13,7 @@ import (
 const (
 	flagApiEndpointHelp = "Target API endpoint"
 	flagFileNameHelp    = "Put here the full file path"
-	flagMappingHelp     = "Field raw like key:value,key2:value2"
+	flagMappingHelp     = "Field colMap like key:value,key2:value2"
 	flagBufferSizeHelp  = "Buffer size for line"
 	flagSeparatorHelp   = "Separator for words in line"
 	flagRpsHelp         = "RPS - good speed for you"
@@ -23,7 +23,7 @@ func main() {
 	config := Config{}
 
 	flag.StringVar(&config.apiEndpoint, "api", "", flagApiEndpointHelp)
-	flag.StringVar(&config.mapping.raw, "raw", "", flagMappingHelp)
+	flag.StringVar(&config.mapping.colMap, "colMap", "", flagMappingHelp)
 	flag.StringVar(&config.filePath, "file", "", flagFileNameHelp)
 	flag.StringVar(&config.separator, "sep", ",", flagSeparatorHelp)
 	flag.IntVar(&config.bufferSize, "bs", 1<<10, flagBufferSizeHelp)
@@ -68,10 +68,13 @@ func main() {
 				break
 			}
 		}
+
 		if raw.headers == nil {
 			cs := CleanString(line, rune(config.separator[0]))
 			raw.headers = strings.Split(cs, config.separator)
+			continue
 		}
+		line = CleanStringFrom(line, `"`, `'`, "\n", "\r")
 		raw.elems = strings.Split(line, config.separator)
 
 		rawChan <- raw

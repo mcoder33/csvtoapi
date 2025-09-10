@@ -30,13 +30,19 @@ func (rs *RunnerService) PrepareLine() {
 		defer rs.wg.Done()
 		defer close(rs.queryParamsChan)
 
+		wg := sync.WaitGroup{}
 		for raw := range rs.rawChan {
-			line, err := PrepareLine(rs.config, raw)
-			if err != nil {
-				log.Println(err)
-			}
-			rs.queryParamsChan <- line
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				line, err := PrepareLine(rs.config, raw)
+				if err != nil {
+					log.Println(err)
+				}
+				rs.queryParamsChan <- line
+			}()
 		}
+		wg.Wait()
 	}()
 }
 
@@ -46,13 +52,19 @@ func (rs *RunnerService) MakeUrl() {
 		defer rs.wg.Done()
 		defer close(rs.urlChan)
 
+		wg := sync.WaitGroup{}
 		for queryParams := range rs.queryParamsChan {
-			targetUrl, err := MakeUrl(rs.config, queryParams)
-			if err != nil {
-				log.Println(err)
-			}
-			rs.urlChan <- *targetUrl
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				targetUrl, err := MakeUrl(rs.config, queryParams)
+				if err != nil {
+					log.Println(err)
+				}
+				rs.urlChan <- *targetUrl
+			}()
 		}
+		wg.Wait()
 	}()
 }
 
@@ -61,11 +73,17 @@ func (rs *RunnerService) Send() {
 		rs.wg.Add(1)
 		defer rs.wg.Done()
 
+		wg := sync.WaitGroup{}
 		for targetUrl := range rs.urlChan {
-			err := Send(targetUrl)
-			if err != nil {
-				log.Println(err)
-			}
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				err := Send(targetUrl)
+				if err != nil {
+					log.Println(err)
+				}
+			}()
 		}
+		wg.Wait()
 	}()
 }

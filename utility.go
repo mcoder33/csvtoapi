@@ -13,3 +13,10 @@ func CleanString(s string, excl rune) string {
 		return -1
 	}, s)
 }
+
+func CleanStringFrom(s string, remove ...string) string {
+	for _, r := range remove {
+		s = strings.ReplaceAll(s, r, "")
+	}
+	return s
+}
