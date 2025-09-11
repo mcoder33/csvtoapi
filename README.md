@@ -1,3 +1,6 @@
+Install
+all ready for use binary files in bin directory
+
 Sending data from CSV to api
 
 -api string
