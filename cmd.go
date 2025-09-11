@@ -32,6 +32,7 @@ func main() {
 
 	config.Initialize()
 
+	//TODO: переделать на возврат ошибки вместо bool
 	if !config.Validate() {
 		flag.PrintDefaults()
 		return
@@ -44,6 +45,7 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 
+	//TODO: пронинуть везде контекст, добавить таймауты для хттп клиента
 	errChan := csvtoapi.NewPipe(config, wg).Run()
 
 	wg.Add(1)
