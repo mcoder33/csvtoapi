@@ -46,6 +46,7 @@ func main() {
 	wg := &sync.WaitGroup{}
 
 	//TODO: пронинуть везде контекст, добавить таймауты для хттп клиента
+	//TODO: рассмотреть политику остановки при первой ошибке
 	errChan := csvtoapi.NewPipe(config, wg).Run()
 
 	wg.Add(1)
