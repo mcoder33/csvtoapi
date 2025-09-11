@@ -14,3 +14,6 @@ Sending data from CSV to api
     RPS - good speed for you (default 10)
 -sep string
     Separator for words in line (default ",")
+
+Example command:
+csvtoapi-mac-arm64 -api https://youre.sit/some/action -file ./tmp/test.csv -colMap someData:someId,customId:newId,anyId:externalAnyId,someStatus:status,createDate:attributionDate,sumOther:sum
