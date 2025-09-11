@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -24,7 +25,11 @@ func (m *Mapping) QueryParam(name string) (string, error) {
 }
 
 func (m *Mapping) Validate() bool {
-	return m.ColMap != "" && strings.Contains(m.ColMap, mapKeyValueSeparator)
+	err := m.Parse()
+	if err != nil {
+		log.Printf("Error parsing mapping: %v", err)
+	}
+	return err == nil && m.ColMap != "" && strings.Contains(m.ColMap, mapKeyValueSeparator)
 }
 
 func (m *Mapping) Parse() error {

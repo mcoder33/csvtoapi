@@ -1,14 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"cvloader/csvtoapi"
 	"cvloader/models"
 	"flag"
-	"io"
 	"log"
-	"os"
-	"strings"
 	"sync"
 )
 
@@ -46,47 +42,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	file, err := os.Open(config.FilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	r := bufio.NewReaderSize(file, config.BufferSize)
-	raw := models.Raw{}
-
 	wg := &sync.WaitGroup{}
-	rawChan := make(chan models.Raw, config.ChannelSize)
 
-	errChan := csvtoapi.NewPipe(rawChan, config, wg).Run()
+	errChan := csvtoapi.NewPipe(config, wg).Run()
+
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		for err := range errChan {
 			log.Println(err)
 		}
 	}()
-
-	canContinue := true
-	for canContinue {
-		line, err := r.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				canContinue = false
-			}
-			if len(line) == 0 {
-				break
-			}
-		}
-
-		line = CleanString(line, `"`, `'`, "\n", "\r")
-		if raw.Headers == nil {
-			raw.Headers = strings.Split(line, config.Separator)
-			continue
-		}
-		raw.Elems = strings.Split(line, config.Separator)
-
-		rawChan <- raw
-	}
-	close(rawChan)
 
 	wg.Wait()
 }

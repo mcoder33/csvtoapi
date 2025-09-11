@@ -17,18 +17,22 @@ type pipe struct {
 	urlChan         chan url.URL
 }
 
-func NewPipe(rawChan chan models.Raw, config models.Config, wg *sync.WaitGroup) *pipe {
+func NewPipe(config models.Config, wg *sync.WaitGroup) *pipe {
 	return &pipe{
 		config:          config,
 		wg:              wg,
-		rawChan:         rawChan,
 		queryParamsChan: make(chan QueryParams, config.ChannelSize),
 		urlChan:         make(chan url.URL, config.ChannelSize),
 	}
 }
 
 func (p *pipe) Run() chan error {
-	return p.prepareLine().makeUrl().send()
+	return p.consume().prepareLine().makeUrl().send()
+}
+
+func (p *pipe) consume() *pipe {
+	p.rawChan = consume(p.wg, p.config)
+	return p
 }
 
 func (p *pipe) prepareLine() *pipe {
