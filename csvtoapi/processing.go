@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type QueryParams map[string]string
@@ -19,9 +18,9 @@ func prepareLine(config models.Config, raw models.Raw) (QueryParams, error) {
 		if colNameSource == "" {
 			return nil, fmt.Errorf("invalid queryParam %s elem %s", raw.Headers[i], elem)
 		}
-		name, err := config.Mapping.QueryParam(colNameSource)
-		if err != nil {
-			return nil, fmt.Errorf("invalid parse line %s; colNameSource: %s; error %w", strings.Join(raw.Elems, config.Separator), colNameSource, err)
+		name := config.Mapping.QueryParam(colNameSource)
+		if name == "" {
+			continue
 		}
 		result[name] = elem
 	}

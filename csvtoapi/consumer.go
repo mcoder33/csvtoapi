@@ -47,6 +47,11 @@ func consume(wg *sync.WaitGroup, config models.Config) chan models.Raw {
 			}
 			raw.Elems = strings.Split(line, config.Separator)
 
+			if len(raw.Headers) != len(raw.Elems) {
+				log.Printf("\n[Error] in line! %s \n!!! [>>>] Check the separator!!! header have %d elements; row have %d elements;\n", line, len(raw.Headers), len(raw.Elems))
+				continue
+			}
+
 			rawChan <- raw
 		}
 	}()

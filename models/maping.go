@@ -16,12 +16,12 @@ type Mapping struct {
 	Storage map[string]string
 }
 
-func (m *Mapping) QueryParam(name string) (string, error) {
+func (m *Mapping) QueryParam(name string) string {
 	elem, ok := m.Storage[name]
 	if !ok {
-		return "", fmt.Errorf("no element named %q Storage %v", name, m.Storage)
+		return ""
 	}
-	return elem, nil
+	return elem
 }
 
 func (m *Mapping) Validate() bool {
